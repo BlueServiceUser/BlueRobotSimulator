@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <title>BlueRobot Simulation</title>       
+    </head>
+
+    <body>
+    	<div id="webgl-container"></div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+        <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+        <script>
+        var socket = io();
+        $(function (){
+
+        });
+        var boxCalls=[];
+
+        socket.on('boxPlaced', function(params)
+        {
+            alert("Box placed")
+        })
+
+        function getPosFromGUI()
+        {
+            return {
+               x: Number($('#txtX').val()),
+               y:Number($('#txtY').val()),
+               z:Number($('#txtZ').val())
+            }
+        }
+
+        function moveRobotToStartPosition()
+        {
+            socket.emit('moveRobot', {x:-50,z:0});
+        }
+
+        function storeNewBox()
+        {
+            moveRobotToStartPosition();
+            socket.emit('pickupBox', getPosFromGUI());
+        }
+
+        function placeBox()
+        {
+            socket.emit('placeBox', getPosFromGUI());
+        }
+
+        function pickUpBox()
+        {
+            socket.emit('pickupBox', getPosFromGUI());
+        }
+
+
+        </script>
+
+        <input type="text" id="txtX" value="20" />        
+        <input type="text" id="txtY" value="-45" />        
+        <input type="text" id="txtZ" value="-80" /> 
+
+        <button  onclick="moveRobotToStartPosition()">Set to start position</button>
+        <button  onclick="storeNewBox()">Store new box</button>
+        <button onclick="placeBox()">Place box</button>
+        <button onclick="pickUpBox()">Pickup box</button>
+
+        
+    </body>
+
+</html>
