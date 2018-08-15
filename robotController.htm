@@ -26,15 +26,16 @@
         {
             return {
                x: Number($('#txtX').val()),
-               y:Number($('#txtY').val()),
-               z:Number($('#txtZ').val())
+               y:Number($('#txtZ').val()),
+               z:Number($('#txtY').val())
             }
         }
 
         function moveRobotToStartPosition()
         {
-            socket.emit('moveRobot', {x:-50,z:0});
+            socket.emit('moveRobot', {x:-50,y:0});
         }
+    
 
         function storeNewBox()
         {
@@ -63,6 +64,7 @@
         <button  onclick="storeNewBox()">Store new box</button>
         <button onclick="placeBox()">Place box</button>
         <button onclick="pickUpBox()">Pickup box</button>
+      
 
         
     </body>

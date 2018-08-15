@@ -22,8 +22,10 @@ var simulator = (function(){
 
     var externalSequence=0;
 
+
     $(function (){
         socket.on('moveRobot', function(position){
+            position=convertPosition(position);
             log("Moving robot to: " + writePos(position))
             externalSequence++;
             moveRobot(position);
@@ -31,6 +33,7 @@ var simulator = (function(){
         })
 
         socket.on('placeBox', function(position){
+            position=convertPosition(position);
             log("Place box: " + writePos(position))
             externalSequence++;
             moveRobot(position);
@@ -39,12 +42,14 @@ var simulator = (function(){
         });
 
         socket.on('pickupBox', function(position){
+            position=convertPosition(position);
             log("Pickup box: " + writePos(position))
             externalSequence++;
             pickupBox(position);
         });
 
         socket.on('addBox', function(position){
+            position=convertPosition(position);
             log("Add box: " + writePos(position))
             externalSequence++;
             addBox({x: position.x, y: position.y, z: position.z})
@@ -99,18 +104,37 @@ var simulator = (function(){
         controls.maxPolarAngle = Math.PI / 2;
         controls.enableKeys = false;
 
+var textureLoader = new THREE.TextureLoader();
+
+var texture0 = textureLoader.load( 'BLUETEXTURE.png' );
+var texture1 = textureLoader.load( 'BLUETEXTURE.png' );
+var texture2 = textureLoader.load( 'BLUETEXTURE.png' );
+var texture3 = textureLoader.load( 'BLUETEXTURE.png' );
+var texture4 = textureLoader.load( 'BLUEFACEFINAL.png' );
+var texture5 = textureLoader.load( 'BLUETEXTURE.png' );
+
+var materials = [
+    new THREE.MeshBasicMaterial( { map: texture0 } ),
+    new THREE.MeshBasicMaterial( { map: texture1 } ),
+    new THREE.MeshBasicMaterial( { map: texture2 } ),
+    new THREE.MeshBasicMaterial( { map: texture3 } ),
+    new THREE.MeshBasicMaterial( { map: texture4 } ),
+    new THREE.MeshBasicMaterial( { map: texture5 } )
+];
+var robotMaterial = new THREE.MeshFaceMaterial( materials );
+
+     
         robot = new THREE.Mesh(
-            new THREE.BoxGeometry(10,5,10),
-            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('carbon.png' ) })
+            new THREE.BoxGeometry(10,3,10),robotMaterial
             );
     
         robot.name="robot";   
-        robot.position.y = 40;
+        robot.position.y = 60;
         scene.add(robot);
     
         robotArm = new THREE.Mesh(
         new THREE.BoxGeometry(10,1,10),
-        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('carbon2.jpg' ) })
+        new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('BLUEDARK.png' ) })
         );
     
         robotArm.name="robotArm";   
@@ -120,7 +144,7 @@ var simulator = (function(){
 
         backWall = new THREE.Mesh(
             new THREE.BoxGeometry(150,150,1),
-            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('brownbrickwall.jpg' ) })
+            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('BLUEWALLNEW.png' ) })
             );
         backWall.name="backWall";   
         backWall.position.z = -100;
@@ -204,14 +228,14 @@ var simulator = (function(){
        scene.remove(wireBackRight) 
        scene.remove(wireBackLeft) 
         lineMaterial = new THREE.LineBasicMaterial({
-            color: 0x6699FF, linewidth: 10  
+            color: 0x6699FF, linewidth: 502  
             
         });
         
         var geometryWirteFrontLeft = new THREE.Geometry();
         geometryWirteFrontLeft.vertices.push(
-            new THREE.Vector3(  robot.position.x-5, robot.position.y+2.5, robot.position.z-5 ),
-            new THREE.Vector3( -50, 50, -100 ),
+            new THREE.Vector3(  robot.position.x-5, robot.position.y+1.5, robot.position.z-5 ),
+            new THREE.Vector3( -50,robot.position.y, -100 ),
         );
         
          wireFrontLeft = new THREE.Line( geometryWirteFrontLeft, lineMaterial );
@@ -220,8 +244,8 @@ var simulator = (function(){
 
         var geometryWirteFrontRight = new THREE.Geometry();
         geometryWirteFrontRight.vertices.push(
-            new THREE.Vector3(  robot.position.x+5, robot.position.y+2.5, robot.position.z-5 ),
-            new THREE.Vector3( 50, 50, -100 ),
+            new THREE.Vector3(  robot.position.x+5, robot.position.y+1.5, robot.position.z-5 ),
+            new THREE.Vector3( 50, robot.position.y, -100 ),
         );
         
         wireFrontRight = new THREE.Line( geometryWirteFrontRight, lineMaterial );
@@ -230,8 +254,8 @@ var simulator = (function(){
 
         var geometryWirteBackLeft = new THREE.Geometry();
         geometryWirteBackLeft.vertices.push(
-            new THREE.Vector3(  robot.position.x-5, robot.position.y+2.5, robot.position.z+5 ),
-            new THREE.Vector3( -50, 50, 0 ),
+            new THREE.Vector3(  robot.position.x-5, robot.position.y+1.5, robot.position.z+5 ),
+            new THREE.Vector3( -50, robot.position.y, 0 ),
         );
         
         wireBackLeft = new THREE.Line( geometryWirteBackLeft, lineMaterial );
@@ -240,8 +264,8 @@ var simulator = (function(){
 
         var geometryWirteBackRight = new THREE.Geometry();
         geometryWirteBackRight.vertices.push(
-            new THREE.Vector3(  robot.position.x+5, robot.position.y+2.5, robot.position.z+5 ),
-            new THREE.Vector3( 50, 50, 0 ),
+            new THREE.Vector3(  robot.position.x+5, robot.position.y+1.5, robot.position.z+5 ),
+            new THREE.Vector3( 50, robot.position.y, 0 ),
         );
         
         wireBackRight = new THREE.Line( geometryWirteBackRight, lineMaterial );
@@ -291,6 +315,11 @@ var simulator = (function(){
         return "X:" + position.x + " Y:" + position.y + " Z:" + position.z;
     }
 
+    function convertPosition(position)
+    {
+        return {x:position.x, z: position.y, y: position.z}
+    }
+
     function pickupBox(boxPosition)
     {
         boxPickupBox = findBox(boxPosition);
@@ -332,9 +361,30 @@ var simulator = (function(){
     }
 
     function addBox(position){
+
+        var textureLoader = new THREE.TextureLoader();
+
+        var texture0 = textureLoader.load( 'EUROBOXSIDE.png' );
+        var texture1 = textureLoader.load( 'EUROBOXSIDE.png' );
+        var texture2 = textureLoader.load( 'EUROBOXLID.png' );
+        var texture3 = textureLoader.load( 'EUROBOXSIDE.png' );
+        var texture4 = textureLoader.load( 'EUROBOXSIDE.png' );
+        var texture5 = textureLoader.load( 'EUROBOXSIDE.png' );
+        
+        var materials = [
+            new THREE.MeshBasicMaterial( { map: texture0 } ),
+            new THREE.MeshBasicMaterial( { map: texture1 } ),
+            new THREE.MeshBasicMaterial( { map: texture2 } ),
+            new THREE.MeshBasicMaterial( { map: texture3 } ),
+            new THREE.MeshBasicMaterial( { map: texture4 } ),
+            new THREE.MeshBasicMaterial( { map: texture5 } )
+        ];
+        var boxMaterial = new THREE.MeshFaceMaterial( materials );
+        
+
         var box = new THREE.Mesh(
             new THREE.BoxGeometry(10,10,10),
-            new THREE.MeshBasicMaterial({ map: new THREE.TextureLoader().load('plastic.jpg' ) })
+            boxMaterial
             );
         box.name="box" + boxes.length;   
         box.position.y = position.y;
