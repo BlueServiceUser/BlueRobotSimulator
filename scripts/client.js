@@ -574,7 +574,7 @@ var robotMaterial = new THREE.MeshFaceMaterial( materials );
           }
         objectsToMove.push({objectToMove:object, destinationPosition:position, sequence:sequence, executeAfterDestinationReached:executeAfterDestinationReached})
         log("Moving obj from:" + object.name + writePos(object.position));
-        log("Moving obj to:" + object.name + writePos(object.position) + " seq:" + sequence + " executeAfterDestinationReached:"+ executeAfterDestinationReached);
+        log("Moving obj to:" + object.name + writePos(position) + " seq:" + sequence + " executeAfterDestinationReached:"+ executeAfterDestinationReached);
       }
 
       function  moveTowardsValue(currentValue, destinationValue)
